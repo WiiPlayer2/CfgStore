@@ -1,0 +1,6 @@
+<Project>
+	<ItemGroup>
+		<Compile Include="../GlobalUsings.cs" />
+		<PackageReference Include="LanguageExt.Transformers" Version="4.4.4" />
+	</ItemGroup>
+</Project>
