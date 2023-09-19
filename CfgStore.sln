@@ -11,11 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{F78951
 		GlobalUsings.cs = GlobalUsings.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Application", "CfgStore.Application\CfgStore.Application.csproj", "{459D2C89-ABEC-450E-B63F-89F802F20135}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Application", "CfgStore.Application\CfgStore.Application.csproj", "{459D2C89-ABEC-450E-B63F-89F802F20135}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Domain", "CfgStore.Domain\CfgStore.Domain.csproj", "{80C496DB-2CA2-407E-A8C9-581A7867A332}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Domain", "CfgStore.Domain\CfgStore.Domain.csproj", "{80C496DB-2CA2-407E-A8C9-581A7867A332}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Application.Tests", "CfgStore.Application.Tests\CfgStore.Application.Tests.csproj", "{77830586-CAB9-4B13-8B11-91F130AACBBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Application.Tests", "CfgStore.Application.Tests\CfgStore.Application.Tests.csproj", "{77830586-CAB9-4B13-8B11-91F130AACBBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
