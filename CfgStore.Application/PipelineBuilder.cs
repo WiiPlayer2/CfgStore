@@ -5,5 +5,10 @@ internal class PipelineBuilder<RT>
 {
     private static readonly Pipeline<RT> FALLTHROUGH_PIPELINE = () => FailAff<Unit>(Errors.PipelineFallthrough);
 
-    public static Pipeline<RT> Build(Seq<PipelineStep<RT>> steps) => FALLTHROUGH_PIPELINE;
+    public static Pipeline<RT> Build(Seq<PipelineStep<RT>> steps) =>
+        steps.HeadOrNone()
+            .Match(
+                step => new Pipeline<RT>(step),
+                () => FALLTHROUGH_PIPELINE
+            );
 }
