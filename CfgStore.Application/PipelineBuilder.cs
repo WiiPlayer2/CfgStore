@@ -8,7 +8,7 @@ internal class PipelineBuilder<RT>
     public static Pipeline<RT> Build(Seq<PipelineStep<RT>> steps) =>
         steps.HeadOrNone()
             .Match(
-                step => new Pipeline<RT>(step),
+                step => () => step(Build(steps.Tail)),
                 () => FALLTHROUGH_PIPELINE
             );
 }
