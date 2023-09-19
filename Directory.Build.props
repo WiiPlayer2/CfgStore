@@ -3,4 +3,17 @@
 		<Compile Include="../GlobalUsings.cs" />
 		<PackageReference Include="LanguageExt.Transformers" Version="4.4.4" />
 	</ItemGroup>
+
+	<!-- Non-Test projects -->
+	<ItemGroup Condition="'$(AssemblyName.EndsWith(`.Tests`))' == 'false'">
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>$(AssemblyName).Tests</_Parameter1>
+			<!-- We use the value of AssemblyName to declare the value of the attribute -->
+		</AssemblyAttribute>
+	</ItemGroup>
+
+	<!-- Test projects -->
+	<ItemGroup Condition="'$(AssemblyName.EndsWith(`.Tests`))' == 'true'">
+		<ProjectReference Include="../$(AssemblyName.TrimEnd(`.Tests`))/$(AssemblyName.TrimEnd(`.Tests`)).csproj" />
+	</ItemGroup>
 </Project>
