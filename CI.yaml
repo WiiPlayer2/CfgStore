@@ -1,0 +1,4 @@
+- Nuget:
+    Project: ./CfgStore.Cli/CfgStore.Cli.csproj
+    VersionSuffix: $TIMESTAMP
+    SourceCredentials: private-nuget-repo

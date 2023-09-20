@@ -5,12 +5,14 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<PackAsTool>true</PackAsTool>
+		<ToolCommandName>cfg-store</ToolCommandName>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="LanguageExt.Sys" Version="4.4.4" />
-	  <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
-	  <PackageReference Include="YamlDotNet" Version="13.3.1" />
+		<PackageReference Include="LanguageExt.Sys" Version="4.4.4" />
+		<PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
+		<PackageReference Include="YamlDotNet" Version="13.3.1" />
 	</ItemGroup>
 
 	<ItemGroup>
