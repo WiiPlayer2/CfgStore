@@ -1,3 +1,5 @@
+using CfgStore.Application.Abstractions;
+
 namespace CfgStore.Application;
 
 internal class PipelineBuilder<RT>

@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CfgStore.Application.Abstractions\CfgStore.Application.Abstractions.csproj" />
     <ProjectReference Include="..\CfgStore.Domain\CfgStore.Domain.csproj" />
   </ItemGroup>
 

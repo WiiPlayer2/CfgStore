@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Domain", "CfgStore
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Application.Tests", "CfgStore.Application.Tests\CfgStore.Application.Tests.csproj", "{77830586-CAB9-4B13-8B11-91F130AACBBA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Modules.Files", "CfgStore.Modules.Files\CfgStore.Modules.Files.csproj", "{6DD4CCDB-517F-4BB4-A3F7-48C710305A54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Application.Abstractions", "CfgStore.Application.Abstractions\CfgStore.Application.Abstractions.csproj", "{5138C1A0-B73F-47FA-824C-B8AB64E70326}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{77830586-CAB9-4B13-8B11-91F130AACBBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77830586-CAB9-4B13-8B11-91F130AACBBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77830586-CAB9-4B13-8B11-91F130AACBBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DD4CCDB-517F-4BB4-A3F7-48C710305A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DD4CCDB-517F-4BB4-A3F7-48C710305A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DD4CCDB-517F-4BB4-A3F7-48C710305A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DD4CCDB-517F-4BB4-A3F7-48C710305A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5138C1A0-B73F-47FA-824C-B8AB64E70326}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5138C1A0-B73F-47FA-824C-B8AB64E70326}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5138C1A0-B73F-47FA-824C-B8AB64E70326}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5138C1A0-B73F-47FA-824C-B8AB64E70326}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
