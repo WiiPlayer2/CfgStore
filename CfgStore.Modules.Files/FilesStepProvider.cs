@@ -6,9 +6,11 @@ namespace CfgStore.Modules.Files;
 
 public class FilesStepProvider<RT> : IPipelineStepProvider<RT> where RT : struct, HasCancel<RT>
 {
+    public PipelineStep<RT> Load { get; } = (store, config, _, _) => throw new NotImplementedException();
+
     public string Name => "files";
 
-    public PipelineStep<RT> Step { get; } = (store, config, _, _) =>
+    public PipelineStep<RT> Store { get; } = (store, config, _, _) =>
         from cfg in ParseConfig(config)
         let filters = cfg.Filters.Count == 0
             ? Seq1("**/*")

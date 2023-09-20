@@ -13,7 +13,7 @@ public class PipelineBuilderTest
 
         // Act
         var result = await PipelineBuilder<RT>.Build(steps)
-            .Invoke(Mock.Of<ICfgFileStore<RT>>(), Seq1(new PipelineStepConfig()))
+            .Invoke(Mock.Of<ICfgFileStore<RT>>(), Seq1(new PipelineStepConfig(new ConfigValue(string.Empty))))
             .Run(RT.New());
 
         // Assert
@@ -40,7 +40,7 @@ public class PipelineBuilderTest
     {
         // Arrange
         var cfgFileStore = Mock.Of<ICfgFileStore<RT>>();
-        var config = new PipelineStepConfig();
+        var config = new PipelineStepConfig(new ConfigValue(string.Empty));
         var configs = Seq1(config);
         var step = new Mock<PipelineStep<RT>>();
         var steps = Seq1(step.Object);
@@ -60,8 +60,8 @@ public class PipelineBuilderTest
     public async Task Build_WithStepAndConfig_PassesConfigToStep()
     {
         // Arrange
-        var config1 = new PipelineStepConfig();
-        var config2 = new PipelineStepConfig();
+        var config1 = new PipelineStepConfig(new ConfigValue(string.Empty));
+        var config2 = new PipelineStepConfig(new ConfigValue(string.Empty));
         var configs = Seq(config1, config2);
         var step1 = new Mock<PipelineStep<RT>>();
         var step2 = new Mock<PipelineStep<RT>>();
@@ -97,7 +97,7 @@ public class PipelineBuilderTest
         // Act
         // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
         await PipelineBuilder<RT>.Build(steps)
-            .Invoke(Mock.Of<ICfgFileStore<RT>>(), Seq(new PipelineStepConfig(), new PipelineStepConfig()))
+            .Invoke(Mock.Of<ICfgFileStore<RT>>(), Seq(new PipelineStepConfig(new ConfigValue(string.Empty)), new PipelineStepConfig(new ConfigValue(string.Empty))))
             .Run(RT.New());
 
         // Assert

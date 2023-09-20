@@ -3,7 +3,9 @@
 public interface IPipelineStepProvider<RT>
     where RT : struct, HasCancel<RT>
 {
+    PipelineStep<RT> Load { get; }
+
     string Name { get; }
 
-    PipelineStep<RT> Step { get; }
+    PipelineStep<RT> Store { get; }
 }

@@ -15,7 +15,7 @@ public class PipelineStepMapBuilderTest
         var result = PipelineStepMapBuilder<RT>.Build(stepProviders);
 
         // Assert
-        ((IEnumerable<(string, PipelineStep<RT>)>) result).Should().BeEmpty();
+        result.ValueTuples.Should().BeEmpty();
     }
 
     [TestMethod]
@@ -30,10 +30,10 @@ public class PipelineStepMapBuilderTest
         var result = PipelineStepMapBuilder<RT>.Build(stepProviders);
 
         // Assert
-        ((IEnumerable<(string, PipelineStep<RT>)>) result).Should().BeEquivalentTo(new[]
+        result.ValueTuples.Should().BeEquivalentTo(new[]
         {
-            ("step1", step1.Step),
-            ("step2", step2.Step),
+            ("step1", new PipelineStepInfo<RT>(step1.Store, step1.Load)),
+            ("step2", new PipelineStepInfo<RT>(step2.Store, step2.Load)),
         });
     }
 }

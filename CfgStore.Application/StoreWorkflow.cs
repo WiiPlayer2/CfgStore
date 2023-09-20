@@ -24,12 +24,12 @@ public class StoreWorkflow<RT>
 
     public static Aff<RT, Unit> ExecuteSingle(
         ICfgFileStore<RT> cfgFileStore,
-        Map<OrdStringOrdinalIgnoreCase, string, PipelineStep<RT>> stepMap,
+        Map<OrdStringOrdinalIgnoreCase, string, PipelineStepInfo<RT>> stepMap,
         PipelineSetup setup) =>
         from _0 in unitAff
         from pipelines in setup.Steps
             .Select(x => stepMap.Find(x.Name).ToEff($"Step {x.Name} does not exist"))
-            .Traverse(identity)
+            .Traverse(x => x.Store)
         let configs = setup.Steps
             .Select(x => x.Config)
             .ToSeq()
