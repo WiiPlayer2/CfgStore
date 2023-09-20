@@ -12,7 +12,9 @@ using Microsoft.Extensions.Hosting;
 using RT = LanguageExt.Sys.Live.Runtime;
 
 await BuildCommandLine()
+    .UseDefaults()
     .UseHost(builder => builder
+        .ConfigureDefaults(args)
         .ConfigureServices((_, services) =>
         {
             services.AddSingleton<ICfgFileStore<RT>, CfgFileStore<RT>>();
