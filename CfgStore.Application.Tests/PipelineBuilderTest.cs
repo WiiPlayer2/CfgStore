@@ -13,7 +13,7 @@ public class PipelineBuilderTest
 
         // Act
         var result = await PipelineBuilder<RT>.Build(steps)
-            .Invoke(Mock.Of<ICfgFileStore>(), Seq1(new PipelineStepConfig()))
+            .Invoke(Mock.Of<ICfgFileStore<RT>>(), Seq1(new PipelineStepConfig()))
             .Run(RT.New());
 
         // Assert
@@ -28,7 +28,7 @@ public class PipelineBuilderTest
 
         // Act
         var result = await PipelineBuilder<RT>.Build(steps)
-            .Invoke(Mock.Of<ICfgFileStore>(), default)
+            .Invoke(Mock.Of<ICfgFileStore<RT>>(), default)
             .Run(RT.New());
 
         // Assert
@@ -39,7 +39,7 @@ public class PipelineBuilderTest
     public async Task Build_WithStep_PassesCfgFileStoreToStep()
     {
         // Arrange
-        var cfgFileStore = Mock.Of<ICfgFileStore>();
+        var cfgFileStore = Mock.Of<ICfgFileStore<RT>>();
         var config = new PipelineStepConfig();
         var configs = Seq1(config);
         var step = new Mock<PipelineStep<RT>>();
@@ -66,20 +66,20 @@ public class PipelineBuilderTest
         var step1 = new Mock<PipelineStep<RT>>();
         var step2 = new Mock<PipelineStep<RT>>();
         var steps = Seq(step1.Object, step2.Object);
-        step1.Setup(s => s(It.IsAny<ICfgFileStore>(), config1, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
-            .Returns((ICfgFileStore cfgFileStore, PipelineStepConfig _, Seq<PipelineStepConfig> nextConfigs, Pipeline<RT> next) => next(cfgFileStore, nextConfigs));
-        step2.Setup(s => s(It.IsAny<ICfgFileStore>(), config2, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
+        step1.Setup(s => s(It.IsAny<ICfgFileStore<RT>>(), config1, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
+            .Returns((ICfgFileStore<RT> cfgFileStore, PipelineStepConfig _, Seq<PipelineStepConfig> nextConfigs, Pipeline<RT> next) => next(cfgFileStore, nextConfigs));
+        step2.Setup(s => s(It.IsAny<ICfgFileStore<RT>>(), config2, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
             .Returns(unitAff);
 
         // Act
         // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
         await PipelineBuilder<RT>.Build(steps)
-            .Invoke(Mock.Of<ICfgFileStore>(), configs)
+            .Invoke(Mock.Of<ICfgFileStore<RT>>(), configs)
             .Run(RT.New());
 
         // Assert
-        step1.Verify(s => s(It.IsAny<ICfgFileStore>(), config1, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
-        step2.Verify(s => s(It.IsAny<ICfgFileStore>(), config2, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
+        step1.Verify(s => s(It.IsAny<ICfgFileStore<RT>>(), config1, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
+        step2.Verify(s => s(It.IsAny<ICfgFileStore<RT>>(), config2, It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
     }
 
     [TestMethod]
@@ -89,19 +89,19 @@ public class PipelineBuilderTest
         var step1 = new Mock<PipelineStep<RT>>();
         var step2 = new Mock<PipelineStep<RT>>();
         var steps = Seq(step1.Object, step2.Object);
-        step1.Setup(s => s(It.IsAny<ICfgFileStore>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
-            .Returns((ICfgFileStore cfgFileStore, PipelineStepConfig _, Seq<PipelineStepConfig> nextConfigs, Pipeline<RT> next) => next(cfgFileStore, nextConfigs));
-        step2.Setup(s => s(It.IsAny<ICfgFileStore>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
+        step1.Setup(s => s(It.IsAny<ICfgFileStore<RT>>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
+            .Returns((ICfgFileStore<RT> cfgFileStore, PipelineStepConfig _, Seq<PipelineStepConfig> nextConfigs, Pipeline<RT> next) => next(cfgFileStore, nextConfigs));
+        step2.Setup(s => s(It.IsAny<ICfgFileStore<RT>>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()))
             .Returns(unitAff);
 
         // Act
         // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
         await PipelineBuilder<RT>.Build(steps)
-            .Invoke(Mock.Of<ICfgFileStore>(), Seq(new PipelineStepConfig(), new PipelineStepConfig()))
+            .Invoke(Mock.Of<ICfgFileStore<RT>>(), Seq(new PipelineStepConfig(), new PipelineStepConfig()))
             .Run(RT.New());
 
         // Assert
-        step1.Verify(s => s(It.IsAny<ICfgFileStore>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
-        step2.Verify(s => s(It.IsAny<ICfgFileStore>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
+        step1.Verify(s => s(It.IsAny<ICfgFileStore<RT>>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
+        step2.Verify(s => s(It.IsAny<ICfgFileStore<RT>>(), It.IsAny<PipelineStepConfig>(), It.IsAny<Seq<PipelineStepConfig>>(), It.IsAny<Pipeline<RT>>()));
     }
 }

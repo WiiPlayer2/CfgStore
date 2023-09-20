@@ -8,6 +8,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="LanguageExt.Sys" Version="4.4.4" />
+	  <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\CfgStore.Application\CfgStore.Application.csproj" />
 	</ItemGroup>
 

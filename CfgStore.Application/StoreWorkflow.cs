@@ -10,7 +10,7 @@ public class StoreWorkflow<RT>
     private const string CFG_MANIFEST_FILE_NAME = "cfg.manifest";
 
     public static Aff<RT, Unit> Execute(
-        ICfgFileStore store,
+        ICfgFileStore<RT> store,
         Seq<IPipelineStepProvider<RT>> stepProviders,
         IManifestReader<RT> manifestReader) =>
         from _0 in unitAff
@@ -23,7 +23,7 @@ public class StoreWorkflow<RT>
         select unit;
 
     public static Aff<RT, Unit> ExecuteSingle(
-        ICfgFileStore cfgFileStore,
+        ICfgFileStore<RT> cfgFileStore,
         Map<OrdStringOrdinalIgnoreCase, string, PipelineStep<RT>> stepMap,
         PipelineSetup setup) =>
         from _0 in unitAff
