@@ -15,5 +15,7 @@ internal class ScopedCfgFileStore<RT> : ICfgFileStore<RT>
 
     public Aff<RT, string> ReadText(string path) => baseStore.ReadText(GetPath(path));
 
+    public Aff<RT, Unit> WriteText(string path, string content) => baseStore.WriteText(GetPath(path), content);
+
     private string GetPath(string path) => Path.Combine(subPath, path);
 }

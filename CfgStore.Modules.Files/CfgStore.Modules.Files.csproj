@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Glob.cs" Version="5.1.1253" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CfgStore.Application.Abstractions\CfgStore.Application.Abstractions.csproj" />
   </ItemGroup>
 

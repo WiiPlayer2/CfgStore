@@ -6,6 +6,7 @@ using System.CommandLine.Parsing;
 using CfgStore.Application;
 using CfgStore.Application.Abstractions;
 using CfgStore.Cli.Implementations;
+using CfgStore.Modules.Files;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RT = LanguageExt.Sys.Live.Runtime;
@@ -16,6 +17,8 @@ await BuildCommandLine()
         {
             services.AddSingleton<ICfgFileStore<RT>, CfgFileStore<RT>>();
             services.AddSingleton<IManifestReader<RT>, ManifestReader<RT>>();
+
+            services.AddSingleton<IPipelineStepProvider<RT>, FilesStepProvider<RT>>();
         }))
     .Build()
     .InvokeAsync(args);
