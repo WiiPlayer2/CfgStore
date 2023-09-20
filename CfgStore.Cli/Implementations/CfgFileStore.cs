@@ -5,6 +5,10 @@ namespace CfgStore.Cli.Implementations;
 internal class CfgFileStore<RT> : ICfgFileStore<RT>
     where RT : struct, HasCancel<RT>
 {
+    public Aff<RT, Seq<string>> List(string? path = default) =>
+        Eff(() => Directory.EnumerateFiles(path ?? string.Empty, "*", SearchOption.AllDirectories)
+            .ToSeq());
+
     public Aff<RT, string> ReadText(string path) => Aff((RT rt) =>
         File.ReadAllTextAsync(path, rt.CancellationToken).ToValue());
 

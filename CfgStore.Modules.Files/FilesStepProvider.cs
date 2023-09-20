@@ -6,7 +6,18 @@ namespace CfgStore.Modules.Files;
 
 public class FilesStepProvider<RT> : IPipelineStepProvider<RT> where RT : struct, HasCancel<RT>
 {
-    public PipelineStep<RT> Load { get; } = (store, config, _, _) => throw new NotImplementedException();
+    public PipelineStep<RT> Load { get; } = (store, config, _, _) =>
+        from cfg in ParseConfig(config)
+        from files in store.List()
+        from _ in files
+            .Select(x =>
+                from content in store.ReadText(x)
+                from path in Eff(() => Path.Combine(cfg.Directory.FullName, x))
+                from _ in Aff((RT rt) => File.WriteAllTextAsync(path, content, rt.CancellationToken).ToUnit().ToValue())
+                select unit
+            )
+            .TraverseParallel(identity)
+        select unit;
 
     public string Name => "files";
 

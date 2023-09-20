@@ -4,12 +4,7 @@ using LanguageExt.ClassInstances;
 
 namespace CfgStore.Application;
 
-internal static class Constants
-{
-    public const string CFG_MANIFEST_FILE_NAME = "cfg.manifest";
-}
-
-public class StoreWorkflow<RT>
+public class LoadWorkflow<RT>
     where RT : struct, HasCancel<RT>
 {
     public static Aff<RT, Unit> Execute(
@@ -32,7 +27,7 @@ public class StoreWorkflow<RT>
         from _0 in unitAff
         from pipelines in setup.Steps
             .Select(x => stepMap.Find(x.Name).ToEff($"Step {x.Name} does not exist"))
-            .Traverse(x => x.Store)
+            .Traverse(x => x.Load)
         let configs = setup.Steps
             .Select(x => x.Config)
             .ToSeq()

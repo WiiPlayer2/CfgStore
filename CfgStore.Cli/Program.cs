@@ -28,9 +28,13 @@ CommandLineBuilder BuildCommandLine()
     var storeCommand = new Command("store", "Stores configuration defined in the manifest in the local folder.");
     storeCommand.Handler = CommandHandler.Create(InvokeStoreWorkflow);
 
+    var loadCommand = new Command("load", "Loads configuration defined in the manifest in the local folder.");
+    loadCommand.Handler = CommandHandler.Create(InvokeLoadWorkflow);
+
     var rootCommand = new RootCommand("Tool to store and load different types of configuration into a folder defined by pipelines inside a manifest.")
     {
         storeCommand,
+        loadCommand,
     };
 
     return new CommandLineBuilder(rootCommand);
@@ -53,4 +57,12 @@ async Task InvokeStoreWorkflow(IHost host, CancellationToken cancellationToken)
     using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
     var runtime = RT.New(cts);
     await StoreWorkflow<RT>.Execute(store, stepProviders, manifestReader).RunUnit(runtime);
+}
+
+async Task InvokeLoadWorkflow(IHost host, CancellationToken cancellationToken)
+{
+    var (store, manifestReader, stepProviders) = Resolve(host);
+    using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+    var runtime = RT.New(cts);
+    await LoadWorkflow<RT>.Execute(store, stepProviders, manifestReader).RunUnit(runtime);
 }
