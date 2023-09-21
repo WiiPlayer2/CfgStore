@@ -1,4 +1,6 @@
-﻿using CfgStore.Application.Abstractions;
+﻿using System.Text.RegularExpressions;
+using CfgStore.Application.Abstractions;
+using LanguageExt.ClassInstances;
 using Map = LanguageExt.Map;
 
 namespace CfgStore.Modules.Environment;
@@ -6,11 +8,16 @@ namespace CfgStore.Modules.Environment;
 public class EnvironmentStepProvider<RT> : IPipelineStepProvider<RT>
     where RT : struct, HasCancel<RT>
 {
+    private static readonly Regex variableRegex = new(@"^\${(?<variable>(\w|_)+)}$");
+
     public PipelineStep<RT> Load { get; } = (store, config, configs, next) =>
         from _0 in unitEff
         from cfg in ParseConfig(config)
         from values in GetValues(cfg.Variables)
-        from _99 in next(store, configs)
+        from mappedConfigs in configs
+            .Select(x => MapConfigEntry(x.Value, values))
+            .Traverse(x => new PipelineStepConfig(x))
+        from _99 in next(store, mappedConfigs)
         select unit;
 
     public string Name => "env";
@@ -24,6 +31,34 @@ public class EnvironmentStepProvider<RT> : IPipelineStepProvider<RT>
                 .Map(y => (x, y)))
             .Traverse(identity)
             .Map(x => Map.createRange(x));
+
+    private static Eff<ConfigEntry> MapConfigEntry(ConfigEntry entry, Map<string, string> values) =>
+        entry.Match(
+            v => MapConfigValue(v, values).Map(x => (ConfigEntry) x),
+            v => MapConfigMap(v, values).Map(x => (ConfigEntry) x),
+            v => MapConfigList(v, values).Map(x => (ConfigEntry) x));
+
+    private static Eff<ConfigList> MapConfigList(ConfigList list, Map<string, string> values) =>
+        from mappedEntries in list.Entries
+            .Select(x => MapConfigEntry(x, values))
+            .Traverse(identity)
+        select new ConfigList(mappedEntries);
+
+    private static Eff<ConfigMap> MapConfigMap(ConfigMap map, Map<string, string> values) =>
+        from mappedEntries in map.Entries.ValueTuples
+            .Select(kv => MapConfigEntry(kv.Value, values).Map(x => (kv.Key, x)))
+            .Traverse(identity)
+        select new ConfigMap(Map.createRange<OrdStringOrdinalIgnoreCase, string, ConfigEntry>(mappedEntries));
+
+    private static Eff<ConfigValue> MapConfigValue(ConfigValue value, Map<string, string> values) =>
+        from match in Eff(() => variableRegex.Match(value.Value))
+        from mappedValue in match.Success
+            ? from variable in Eff(() => match.Groups["variable"].Value)
+              from value in values.Find(variable).ToEff($"Variable ${{{variable}}} was not configured.")
+              let mappedValue = new ConfigValue(value)
+              select mappedValue
+            : SuccessEff(value)
+        select mappedValue;
 
     private static Eff<Config> ParseConfig(PipelineStepConfig config) =>
         from variables in config.Value.Get("variables").GetSeq()

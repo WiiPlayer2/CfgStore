@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Modules.Files", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Application.Abstractions", "CfgStore.Application.Abstractions\CfgStore.Application.Abstractions.csproj", "{5138C1A0-B73F-47FA-824C-B8AB64E70326}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Modules.Environment", "CfgStore.Modules.Environment\CfgStore.Modules.Environment.csproj", "{7248BB8F-44E7-4D27-806E-E6E30ED3231B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Modules.Environment", "CfgStore.Modules.Environment\CfgStore.Modules.Environment.csproj", "{7248BB8F-44E7-4D27-806E-E6E30ED3231B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
