@@ -18,6 +18,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\CfgStore.Application\CfgStore.Application.csproj" />
+		<ProjectReference Include="..\CfgStore.Modules.Environment\CfgStore.Modules.Environment.csproj" />
 		<ProjectReference Include="..\CfgStore.Modules.Files\CfgStore.Modules.Files.csproj" />
 	</ItemGroup>
 

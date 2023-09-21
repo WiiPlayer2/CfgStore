@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Application.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Modules.Files", "CfgStore.Modules.Files\CfgStore.Modules.Files.csproj", "{6DD4CCDB-517F-4BB4-A3F7-48C710305A54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Application.Abstractions", "CfgStore.Application.Abstractions\CfgStore.Application.Abstractions.csproj", "{5138C1A0-B73F-47FA-824C-B8AB64E70326}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Application.Abstractions", "CfgStore.Application.Abstractions\CfgStore.Application.Abstractions.csproj", "{5138C1A0-B73F-47FA-824C-B8AB64E70326}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Modules.Environment", "CfgStore.Modules.Environment\CfgStore.Modules.Environment.csproj", "{7248BB8F-44E7-4D27-806E-E6E30ED3231B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{5138C1A0-B73F-47FA-824C-B8AB64E70326}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5138C1A0-B73F-47FA-824C-B8AB64E70326}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5138C1A0-B73F-47FA-824C-B8AB64E70326}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7248BB8F-44E7-4D27-806E-E6E30ED3231B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7248BB8F-44E7-4D27-806E-E6E30ED3231B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7248BB8F-44E7-4D27-806E-E6E30ED3231B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7248BB8F-44E7-4D27-806E-E6E30ED3231B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
