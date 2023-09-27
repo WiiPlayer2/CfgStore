@@ -64,12 +64,24 @@ CommandLineBuilder BuildCommandLine()
 
 async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>, IManifestReader<RT>, Aff<RT, Unit>> invocation, DirectoryInfo? directory, IHost host, CancellationToken cancellationToken)
 {
-    if (directory is not null) Environment.CurrentDirectory = directory.FullName;
-
     var (store, manifestReader, stepProviders, logger) = Resolve(host);
     using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
     var runtime = RT.New(cts);
-    var result = await invocation(store, stepProviders, manifestReader).Run(runtime);
+
+    var result = await (
+        from _0 in Eff(fun(() =>
+        {
+            if (directory is not null)
+            {
+                logger.LogInformation("Changing directory to {directory}", directory);
+                Environment.CurrentDirectory = directory.FullName;
+            }
+
+            logger.LogInformation("Using directory {directory}", Environment.CurrentDirectory);
+        }))
+        from _1 in invocation(store, stepProviders, manifestReader)
+        select unit
+    ).Run(runtime);
 
     result.IfFail(LogError);
 
