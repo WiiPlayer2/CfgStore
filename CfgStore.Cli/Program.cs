@@ -13,6 +13,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RT = LanguageExt.Sys.Live.Runtime;
 
+const string cfgStoreGlobalDirectoryVariableName = "CFG_STORE_GLOBAL_DIRECTORY";
+
+var globalDirectory = Optional(Environment.GetEnvironmentVariable(cfgStoreGlobalDirectoryVariableName))
+    .IfNone(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cfg-store"));
+
 await BuildCommandLine()
     .UseDefaults()
     .UseHost(builder => builder
@@ -42,6 +47,10 @@ CommandLineBuilder BuildCommandLine()
             new[] {"--directory", "-C",},
             () => default,
             "Change to this directory before performing any action."),
+        new System.CommandLine.Option<bool>(
+            new[] {"--global", "-g",},
+            () => false,
+            $"Use the global directory ({globalDirectory}) for performing actions.\nCan be changed using the environment variable {cfgStoreGlobalDirectoryVariableName}.\nOverrides --directory."),
         storeCommand,
         loadCommand,
     };
@@ -62,7 +71,7 @@ CommandLineBuilder BuildCommandLine()
     host.Services.GetRequiredService<ILogger<Program>>()
 );
 
-async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>, IManifestReader<RT>, Aff<RT, Unit>> invocation, DirectoryInfo? directory, IHost host, CancellationToken cancellationToken)
+async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>, IManifestReader<RT>, Aff<RT, Unit>> invocation, WorkflowArgs args, IHost host, CancellationToken cancellationToken)
 {
     var (store, manifestReader, stepProviders, logger) = Resolve(host);
     using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -71,10 +80,17 @@ async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>
     var result = await (
         from _0 in Eff(fun(() =>
         {
-            if (directory is not null)
+            if (args.Global)
             {
-                logger.LogInformation("Changing directory to {directory}", directory);
-                Environment.CurrentDirectory = directory.FullName;
+                logger.LogInformation("Changing to global directory");
+                if (!Directory.Exists(globalDirectory)) Directory.CreateDirectory(globalDirectory);
+
+                Environment.CurrentDirectory = globalDirectory;
+            }
+            else if (args.Directory is not null)
+            {
+                logger.LogInformation("Changing directory to {directory}", args.Directory);
+                Environment.CurrentDirectory = args.Directory.FullName;
             }
 
             logger.LogInformation("Using directory {directory}", Environment.CurrentDirectory);
@@ -105,8 +121,12 @@ async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>
     }
 }
 
-Task InvokeStoreWorkflow(DirectoryInfo? directory, IHost host, CancellationToken cancellationToken) =>
-    InvokeWorkflow(StoreWorkflow<RT>.Execute, directory, host, cancellationToken);
+Task InvokeStoreWorkflow(WorkflowArgs args, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow(StoreWorkflow<RT>.Execute, args, host, cancellationToken);
 
-Task InvokeLoadWorkflow(DirectoryInfo? directory, IHost host, CancellationToken cancellationToken) =>
-    InvokeWorkflow(LoadWorkflow<RT>.Execute, directory, host, cancellationToken);
+Task InvokeLoadWorkflow(WorkflowArgs args, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow(LoadWorkflow<RT>.Execute, args, host, cancellationToken);
+
+internal record WorkflowArgs(
+    DirectoryInfo? Directory,
+    bool Global);
