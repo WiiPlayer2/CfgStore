@@ -38,6 +38,10 @@ CommandLineBuilder BuildCommandLine()
 
     var rootCommand = new RootCommand("Tool to store and load different types of configuration into a folder defined by pipelines inside a manifest.")
     {
+        new System.CommandLine.Option<DirectoryInfo?>(
+            new[] {"--directory", "-C",},
+            () => default,
+            "Change to this directory before performing any action."),
         storeCommand,
         loadCommand,
     };
@@ -58,8 +62,10 @@ CommandLineBuilder BuildCommandLine()
     host.Services.GetRequiredService<ILogger<Program>>()
 );
 
-async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>, IManifestReader<RT>, Aff<RT, Unit>> invocation, IHost host, CancellationToken cancellationToken)
+async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>, IManifestReader<RT>, Aff<RT, Unit>> invocation, DirectoryInfo? directory, IHost host, CancellationToken cancellationToken)
 {
+    if (directory is not null) Environment.CurrentDirectory = directory.FullName;
+
     var (store, manifestReader, stepProviders, logger) = Resolve(host);
     using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
     var runtime = RT.New(cts);
@@ -87,8 +93,8 @@ async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>
     }
 }
 
-Task InvokeStoreWorkflow(IHost host, CancellationToken cancellationToken) =>
-    InvokeWorkflow(StoreWorkflow<RT>.Execute, host, cancellationToken);
+Task InvokeStoreWorkflow(DirectoryInfo? directory, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow(StoreWorkflow<RT>.Execute, directory, host, cancellationToken);
 
-Task InvokeLoadWorkflow(IHost host, CancellationToken cancellationToken) =>
-    InvokeWorkflow(LoadWorkflow<RT>.Execute, host, cancellationToken);
+Task InvokeLoadWorkflow(DirectoryInfo? directory, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow(LoadWorkflow<RT>.Execute, directory, host, cancellationToken);
