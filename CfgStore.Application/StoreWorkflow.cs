@@ -4,11 +4,6 @@ using LanguageExt.ClassInstances;
 
 namespace CfgStore.Application;
 
-internal static class Constants
-{
-    public const string CFG_MANIFEST_FILE_NAME = "cfg.manifest";
-}
-
 public class StoreWorkflow<RT>
     where RT : struct, HasCancel<RT>
 {
