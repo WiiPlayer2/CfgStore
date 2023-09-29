@@ -29,6 +29,9 @@ await BuildCommandLine()
 
             services.AddSingleton<IPipelineStepProvider<RT>, FilesStepProvider<RT>>();
             services.AddSingleton<IPipelineStepProvider<RT>, EnvironmentStepProvider<RT>>();
+
+            services.AddSingleton<StoreWorkflow<RT>>();
+            services.AddSingleton<LoadWorkflow<RT>>();
         }))
     .Build()
     .InvokeAsync(args);
@@ -44,11 +47,11 @@ CommandLineBuilder BuildCommandLine()
     var rootCommand = new RootCommand("Tool to store and load different types of configuration into a folder defined by pipelines inside a manifest.")
     {
         new System.CommandLine.Option<DirectoryInfo?>(
-            new[] {"--directory", "-C",},
+            new[] {"--directory", "-C"},
             () => default,
             "Change to this directory before performing any action."),
         new System.CommandLine.Option<bool>(
-            new[] {"--global", "-g",},
+            new[] {"--global", "-g"},
             () => false,
             $"Use the global directory ({globalDirectory}) for performing actions.\nCan be changed using the environment variable {cfgStoreGlobalDirectoryVariableName}.\nOverrides --directory."),
         storeCommand,
@@ -59,21 +62,18 @@ CommandLineBuilder BuildCommandLine()
 }
 
 (
-    ICfgFileStore<RT> Store,
-    IManifestReader<RT> ManifestReader,
-    Seq<IPipelineStepProvider<RT>> StepProviders,
-    ILogger<Program> Logger
-    ) Resolve(IHost host) =>
+    ILogger<Program> Logger,
+    TWorkflow Workflow
+    ) Resolve<TWorkflow>(IHost host)
+    where TWorkflow : notnull =>
 (
-    host.Services.GetRequiredService<ICfgFileStore<RT>>(),
-    host.Services.GetRequiredService<IManifestReader<RT>>(),
-    host.Services.GetRequiredService<IEnumerable<IPipelineStepProvider<RT>>>().ToSeq(),
-    host.Services.GetRequiredService<ILogger<Program>>()
+    host.Services.GetRequiredService<ILogger<Program>>(),
+    host.Services.GetRequiredService<TWorkflow>()
 );
 
-async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>, IManifestReader<RT>, Aff<RT, Unit>> invocation, WorkflowArgs args, IHost host, CancellationToken cancellationToken)
+async Task InvokeWorkflow<TWorkflow>(Func<TWorkflow, Aff<RT, Unit>> invocation, WorkflowArgs args, IHost host, CancellationToken cancellationToken)
 {
-    var (store, manifestReader, stepProviders, logger) = Resolve(host);
+    var (logger, workflow) = Resolve<TWorkflow>(host);
     using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
     var runtime = RT.New(cts);
 
@@ -83,7 +83,10 @@ async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>
             if (args.Global)
             {
                 logger.LogInformation("Changing to global directory");
-                if (!Directory.Exists(globalDirectory)) Directory.CreateDirectory(globalDirectory);
+                if (!Directory.Exists(globalDirectory))
+                {
+                    Directory.CreateDirectory(globalDirectory);
+                }
 
                 Environment.CurrentDirectory = globalDirectory;
             }
@@ -95,7 +98,7 @@ async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>
 
             logger.LogInformation("Using directory {directory}", Environment.CurrentDirectory);
         }))
-        from _1 in invocation(store, stepProviders, manifestReader)
+        from _1 in invocation(workflow)
         select unit
     ).Run(runtime);
 
@@ -122,10 +125,10 @@ async Task InvokeWorkflow(Func<ICfgFileStore<RT>, Seq<IPipelineStepProvider<RT>>
 }
 
 Task InvokeStoreWorkflow(WorkflowArgs args, IHost host, CancellationToken cancellationToken) =>
-    InvokeWorkflow(StoreWorkflow<RT>.Execute, args, host, cancellationToken);
+    InvokeWorkflow<StoreWorkflow<RT>>(w => w.Execute(), args, host, cancellationToken);
 
 Task InvokeLoadWorkflow(WorkflowArgs args, IHost host, CancellationToken cancellationToken) =>
-    InvokeWorkflow(LoadWorkflow<RT>.Execute, args, host, cancellationToken);
+    InvokeWorkflow<LoadWorkflow<RT>>(w => w.Execute(), args, host, cancellationToken);
 
 internal record WorkflowArgs(
     DirectoryInfo? Directory,

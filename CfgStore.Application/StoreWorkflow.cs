@@ -7,10 +7,23 @@ namespace CfgStore.Application;
 public class StoreWorkflow<RT>
     where RT : struct, HasCancel<RT>
 {
-    public static Aff<RT, Unit> Execute(
+    private readonly IManifestReader<RT> manifestReader;
+
+    private readonly Seq<IPipelineStepProvider<RT>> stepProviders;
+
+    private readonly ICfgFileStore<RT> store;
+
+    public StoreWorkflow(
         ICfgFileStore<RT> store,
-        Seq<IPipelineStepProvider<RT>> stepProviders,
-        IManifestReader<RT> manifestReader) =>
+        IEnumerable<IPipelineStepProvider<RT>> stepProviders,
+        IManifestReader<RT> manifestReader)
+    {
+        this.store = store;
+        this.stepProviders = stepProviders.ToSeq();
+        this.manifestReader = manifestReader;
+    }
+
+    public Aff<RT, Unit> Execute() =>
         from _0 in unitAff
         from cfgManifest in manifestReader.Read(store, Constants.CFG_MANIFEST_FILE_NAME)
         let stepMap = PipelineStepMapBuilder<RT>.Build(stepProviders)
