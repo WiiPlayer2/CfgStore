@@ -26,6 +26,7 @@ await BuildCommandLine()
         {
             services.AddSingleton<ICfgFileStore<RT>, CfgFileStore<RT>>();
             services.AddSingleton<IManifestReader<RT>, ManifestReader<RT>>();
+            services.AddSingleton<IGitApi<RT>, GitApi<RT>>();
 
             services.AddSingleton<IPipelineStepProvider<RT>, FilesStepProvider<RT>>();
             services.AddSingleton<IPipelineStepProvider<RT>, EnvironmentStepProvider<RT>>();
@@ -38,7 +39,13 @@ await BuildCommandLine()
 
 CommandLineBuilder BuildCommandLine()
 {
-    var storeCommand = new Command("store", "Stores configuration defined in the manifest in the local folder.");
+    var storeCommand = new Command("store", "Stores configuration defined in the manifest in the local folder.")
+    {
+        new System.CommandLine.Option<string>(
+            new[] {"--message-template", "-m"},
+            () => "Update",
+            "The commit message template used for commiting after storing if directory is also a git repository."),
+    };
     storeCommand.Handler = CommandHandler.Create(InvokeStoreWorkflow);
 
     var loadCommand = new Command("load", "Loads configuration defined in the manifest in the local folder.");
@@ -71,7 +78,7 @@ CommandLineBuilder BuildCommandLine()
     host.Services.GetRequiredService<TWorkflow>()
 );
 
-async Task InvokeWorkflow<TWorkflow>(Func<TWorkflow, Aff<RT, Unit>> invocation, WorkflowArgs args, IHost host, CancellationToken cancellationToken)
+async Task InvokeWorkflow<TWorkflow>(Func<TWorkflow, Aff<RT, Unit>> invocation, GlobalArgs args, IHost host, CancellationToken cancellationToken)
 {
     var (logger, workflow) = Resolve<TWorkflow>(host);
     using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -124,12 +131,15 @@ async Task InvokeWorkflow<TWorkflow>(Func<TWorkflow, Aff<RT, Unit>> invocation, 
     }
 }
 
-Task InvokeStoreWorkflow(WorkflowArgs args, IHost host, CancellationToken cancellationToken) =>
-    InvokeWorkflow<StoreWorkflow<RT>>(w => w.Execute(), args, host, cancellationToken);
+Task InvokeStoreWorkflow(GlobalArgs args, StoreArgs storeArgs, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow<StoreWorkflow<RT>>(w => w.Execute(storeArgs.MessageTemplate), args, host, cancellationToken);
 
-Task InvokeLoadWorkflow(WorkflowArgs args, IHost host, CancellationToken cancellationToken) =>
+Task InvokeLoadWorkflow(GlobalArgs args, IHost host, CancellationToken cancellationToken) =>
     InvokeWorkflow<LoadWorkflow<RT>>(w => w.Execute(), args, host, cancellationToken);
 
-internal record WorkflowArgs(
+internal record GlobalArgs(
     DirectoryInfo? Directory,
     bool Global);
+
+internal record StoreArgs(
+    string MessageTemplate);
