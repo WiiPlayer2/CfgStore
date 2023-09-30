@@ -37,6 +37,7 @@ await BuildCommandLine()
             services.AddSingleton<LoadWorkflow<RT>>();
             services.AddSingleton<PushWorkflow<RT>>();
             services.AddSingleton<PullWorkflow<RT>>();
+            services.AddSingleton<SyncWorkflow<RT>>();
         }))
     .Build()
     .InvokeAsync(args);
@@ -46,7 +47,11 @@ CommandLineBuilder BuildCommandLine()
     var messageTemplateOption = new System.CommandLine.Option<string>(
         new[] {"--message-template", "-m"},
         () => "Update configuration from {{ Hostname }}",
-        "The commit message template used for commiting after storing if directory is also a git repository.");
+        "The commit message template used for commiting after storing if directory is also a git repository.\n"
+        + "Available templating values are:\n"
+        + "{{ Hostname }} - Hostname of the machine\n"
+        + "{{ Domain }} - Domain name of the machine\n"
+        + "{{ Fqdn }} - FQDN of the machine\n");
     var storeCommand = new Command("store", "Stores configuration defined in the manifest in the local folder.")
     {
         messageTemplateOption,
@@ -65,6 +70,12 @@ CommandLineBuilder BuildCommandLine()
     var pullCommand = new Command("pull", "Pulls and loads configurations defined in the manifest in the local folder.");
     pullCommand.Handler = CommandHandler.Create(InvokePullWorkflow);
 
+    var syncCommand = new Command("sync", "Pulls and pushes configuration defined in the manifest in the local folder.")
+    {
+        messageTemplateOption,
+    };
+    syncCommand.Handler = CommandHandler.Create(InvokeSyncWorkflow);
+
     var rootCommand = new RootCommand("Tool to store and load different types of configuration into a folder defined by pipelines inside a manifest.")
     {
         new System.CommandLine.Option<DirectoryInfo?>(
@@ -79,6 +90,7 @@ CommandLineBuilder BuildCommandLine()
         loadCommand,
         pushCommand,
         pullCommand,
+        syncCommand,
     };
 
     return new CommandLineBuilder(rootCommand);
@@ -159,6 +171,9 @@ Task InvokePushWorkflow(GlobalArgs args, PushArgs pushArgs, IHost host, Cancella
 Task InvokePullWorkflow(GlobalArgs args, IHost host, CancellationToken cancellationToken) =>
     InvokeWorkflow<PullWorkflow<RT>>(w => w.Execute(), args, host, cancellationToken);
 
+Task InvokeSyncWorkflow(GlobalArgs args, SyncArgs syncArgs, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow<SyncWorkflow<RT>>(w => w.Execute(syncArgs.MessageTemplate), args, host, cancellationToken);
+
 internal record GlobalArgs(
     DirectoryInfo? Directory,
     bool Global);
@@ -167,4 +182,7 @@ internal record StoreArgs(
     string MessageTemplate);
 
 internal record PushArgs(
+    string MessageTemplate);
+
+internal record SyncArgs(
     string MessageTemplate);
