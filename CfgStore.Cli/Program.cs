@@ -27,6 +27,8 @@ await BuildCommandLine()
             services.AddSingleton<ICfgFileStore<RT>, CfgFileStore<RT>>();
             services.AddSingleton<IManifestReader<RT>, ManifestReader<RT>>();
             services.AddSingleton<IGitApi<RT>, GitApi<RT>>();
+            services.AddSingleton<ITemplateRenderer<RT>, TemplateRenderer<RT>>();
+            services.AddSingleton<ISystemDataProvider<RT>, SystemDataProvider<RT>>();
 
             services.AddSingleton<IPipelineStepProvider<RT>, FilesStepProvider<RT>>();
             services.AddSingleton<IPipelineStepProvider<RT>, EnvironmentStepProvider<RT>>();
@@ -43,7 +45,7 @@ CommandLineBuilder BuildCommandLine()
     {
         new System.CommandLine.Option<string>(
             new[] {"--message-template", "-m"},
-            () => "Update",
+            () => "Update configuration from {{ Hostname }}",
             "The commit message template used for commiting after storing if directory is also a git repository."),
     };
     storeCommand.Handler = CommandHandler.Create(InvokeStoreWorkflow);

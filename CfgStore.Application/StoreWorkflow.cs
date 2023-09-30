@@ -15,16 +15,24 @@ public class StoreWorkflow<RT>
 
     private readonly ICfgFileStore<RT> store;
 
+    private readonly ISystemDataProvider<RT> systemDataProvider;
+
+    private readonly ITemplateRenderer<RT> templateRenderer;
+
     public StoreWorkflow(
         ICfgFileStore<RT> store,
         IEnumerable<IPipelineStepProvider<RT>> stepProviders,
         IManifestReader<RT> manifestReader,
-        IGitApi<RT> gitApi)
+        IGitApi<RT> gitApi,
+        ITemplateRenderer<RT> templateRenderer,
+        ISystemDataProvider<RT> systemDataProvider)
     {
         this.store = store;
         this.stepProviders = stepProviders.ToSeq();
         this.manifestReader = manifestReader;
         this.gitApi = gitApi;
+        this.templateRenderer = templateRenderer;
+        this.systemDataProvider = systemDataProvider;
     }
 
     public Aff<RT, Unit> Execute(
@@ -59,7 +67,20 @@ public class StoreWorkflow<RT>
             ? gitApi.HasChanges()
             : SuccessAff(false)
         from _ in hasChanges
-            ? gitApi.CommitAllChanges(commitMessageTemplate)
+            ? from message in RenderCommitMessageTemplate(commitMessageTemplate)
+              from _ in gitApi.CommitAllChanges(message)
+              select unit
             : unitAff
         select unit;
+
+    private Aff<RT, string> RenderCommitMessageTemplate(string commitMessageTemplate) =>
+        from hostname in systemDataProvider.Hostname
+        from domain in systemDataProvider.Domain
+        let fqdn = $"{hostname}.{domain}"
+        let data = new CommitMessageTemplateData(
+            hostname,
+            domain,
+            fqdn)
+        from message in templateRenderer.Render(commitMessageTemplate, data)
+        select message;
 }
