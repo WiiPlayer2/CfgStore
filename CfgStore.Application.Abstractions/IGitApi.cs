@@ -8,4 +8,6 @@ public interface IGitApi<RT>
     Aff<RT, bool> HasChanges();
 
     Aff<RT, bool> IsGitRepository();
+
+    Aff<RT, Unit> Push();
 }

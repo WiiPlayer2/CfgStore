@@ -35,23 +35,31 @@ await BuildCommandLine()
 
             services.AddSingleton<StoreWorkflow<RT>>();
             services.AddSingleton<LoadWorkflow<RT>>();
+            services.AddSingleton<PushWorkflow<RT>>();
         }))
     .Build()
     .InvokeAsync(args);
 
 CommandLineBuilder BuildCommandLine()
 {
+    var messageTemplateOption = new System.CommandLine.Option<string>(
+        new[] {"--message-template", "-m"},
+        () => "Update configuration from {{ Hostname }}",
+        "The commit message template used for commiting after storing if directory is also a git repository.");
     var storeCommand = new Command("store", "Stores configuration defined in the manifest in the local folder.")
     {
-        new System.CommandLine.Option<string>(
-            new[] {"--message-template", "-m"},
-            () => "Update configuration from {{ Hostname }}",
-            "The commit message template used for commiting after storing if directory is also a git repository."),
+        messageTemplateOption,
     };
     storeCommand.Handler = CommandHandler.Create(InvokeStoreWorkflow);
 
     var loadCommand = new Command("load", "Loads configuration defined in the manifest in the local folder.");
     loadCommand.Handler = CommandHandler.Create(InvokeLoadWorkflow);
+
+    var pushCommand = new Command("push", "Stores and pushes configuration defined in the manifest local folder.")
+    {
+        messageTemplateOption,
+    };
+    pushCommand.Handler = CommandHandler.Create(InvokePushWorkflow);
 
     var rootCommand = new RootCommand("Tool to store and load different types of configuration into a folder defined by pipelines inside a manifest.")
     {
@@ -65,6 +73,7 @@ CommandLineBuilder BuildCommandLine()
             $"Use the global directory ({globalDirectory}) for performing actions.\nCan be changed using the environment variable {cfgStoreGlobalDirectoryVariableName}.\nOverrides --directory."),
         storeCommand,
         loadCommand,
+        pushCommand,
     };
 
     return new CommandLineBuilder(rootCommand);
@@ -139,9 +148,15 @@ Task InvokeStoreWorkflow(GlobalArgs args, StoreArgs storeArgs, IHost host, Cance
 Task InvokeLoadWorkflow(GlobalArgs args, IHost host, CancellationToken cancellationToken) =>
     InvokeWorkflow<LoadWorkflow<RT>>(w => w.Execute(), args, host, cancellationToken);
 
+Task InvokePushWorkflow(GlobalArgs args, PushArgs pushArgs, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow<PushWorkflow<RT>>(w => w.Execute(pushArgs.MessageTemplate), args, host, cancellationToken);
+
 internal record GlobalArgs(
     DirectoryInfo? Directory,
     bool Global);
 
 internal record StoreArgs(
+    string MessageTemplate);
+
+internal record PushArgs(
     string MessageTemplate);
