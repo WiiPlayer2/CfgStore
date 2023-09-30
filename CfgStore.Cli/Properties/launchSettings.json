@@ -2,7 +2,7 @@
   "profiles": {
     "CfgStore.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "-C ./tmp push"
+      "commandLineArgs": "-C ./tmp pull"
     }
   }
 }

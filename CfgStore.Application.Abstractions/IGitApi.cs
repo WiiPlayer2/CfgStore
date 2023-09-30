@@ -9,5 +9,7 @@ public interface IGitApi<RT>
 
     Aff<RT, bool> IsGitRepository();
 
+    Aff<RT, Unit> Pull();
+
     Aff<RT, Unit> Push();
 }

@@ -36,6 +36,7 @@ await BuildCommandLine()
             services.AddSingleton<StoreWorkflow<RT>>();
             services.AddSingleton<LoadWorkflow<RT>>();
             services.AddSingleton<PushWorkflow<RT>>();
+            services.AddSingleton<PullWorkflow<RT>>();
         }))
     .Build()
     .InvokeAsync(args);
@@ -61,6 +62,9 @@ CommandLineBuilder BuildCommandLine()
     };
     pushCommand.Handler = CommandHandler.Create(InvokePushWorkflow);
 
+    var pullCommand = new Command("pull", "Pulls and loads configurations defined in the manifest in the local folder.");
+    pullCommand.Handler = CommandHandler.Create(InvokePullWorkflow);
+
     var rootCommand = new RootCommand("Tool to store and load different types of configuration into a folder defined by pipelines inside a manifest.")
     {
         new System.CommandLine.Option<DirectoryInfo?>(
@@ -74,6 +78,7 @@ CommandLineBuilder BuildCommandLine()
         storeCommand,
         loadCommand,
         pushCommand,
+        pullCommand,
     };
 
     return new CommandLineBuilder(rootCommand);
@@ -150,6 +155,9 @@ Task InvokeLoadWorkflow(GlobalArgs args, IHost host, CancellationToken cancellat
 
 Task InvokePushWorkflow(GlobalArgs args, PushArgs pushArgs, IHost host, CancellationToken cancellationToken) =>
     InvokeWorkflow<PushWorkflow<RT>>(w => w.Execute(pushArgs.MessageTemplate), args, host, cancellationToken);
+
+Task InvokePullWorkflow(GlobalArgs args, IHost host, CancellationToken cancellationToken) =>
+    InvokeWorkflow<PullWorkflow<RT>>(w => w.Execute(), args, host, cancellationToken);
 
 internal record GlobalArgs(
     DirectoryInfo? Directory,

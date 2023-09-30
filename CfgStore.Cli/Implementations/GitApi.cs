@@ -25,6 +25,12 @@ internal class GitApi<RT> : IGitApi<RT>
     public Aff<RT, bool> IsGitRepository() =>
         Eff(() => Directory.Exists(".git"));
 
+    public Aff<RT, Unit> Pull() =>
+        Aff(async (RT rt) => await CliWrap.Cli.Wrap("git")
+                .WithArguments("pull")
+                .ExecuteBufferedAsync(rt.CancellationToken))
+            .Map(_ => unit);
+
     public Aff<RT, Unit> Push() =>
         Aff(async (RT rt) => await CliWrap.Cli.Wrap("git")
                 .WithArguments("push")
