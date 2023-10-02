@@ -1,5 +1,4 @@
 ﻿using CfgStore.Application.Abstractions;
-using CliWrap;
 using CliWrap.Buffered;
 
 namespace CfgStore.Cli.Implementations;
@@ -23,10 +22,9 @@ internal class GitApi<RT> : IGitApi<RT>
 
     public Aff<RT, bool> HasChanges() =>
         Aff(async (RT rt) => await CliWrap.Cli.Wrap("git")
-                .WithArguments("diff --exit-code")
-                .WithValidation(CommandResultValidation.None)
+                .WithArguments("status --porcelain")
                 .ExecuteBufferedAsync(rt.CancellationToken))
-            .Map(x => x.ExitCode != 0);
+            .Map(x => !string.IsNullOrWhiteSpace(x.StandardOutput));
 
     public Aff<RT, bool> IsGitRepository() =>
         Eff(() => Directory.Exists(".git"));
