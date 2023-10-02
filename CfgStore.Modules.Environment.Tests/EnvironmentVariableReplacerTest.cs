@@ -5,6 +5,30 @@ namespace CfgStore.Modules.Environment.Tests;
 [TestClass]
 public class EnvironmentVariableReplacerTest
 {
+    [DataRow("${test}${test3}${test}", "value${test}value")]
+    [DataRow("${test3}", "${test}")]
+    [DataRow("${test}${test}${test2}", "valuevaluevalue2")]
+    [DataRow("${test}${test2}${test2}", "valuevalue2value2")]
+    [DataRow("${test}${test}${test}", "valuevaluevalue")]
+    [DataRow("__${ test// }123", "__${ test// }123")]
+    [DataRow("__${test//}123", "__${test//}123")]
+    [DataRow("__${test//", "__${test//")]
+    [DataTestMethod]
+    public void Replace(string template, string expected)
+    {
+        // Arrange
+        var env = Map(
+            ("test", "value"),
+            ("test2", "value2"),
+            ("test3", "${test}"));
+
+        // Act
+        var result = EnvironmentVariableReplacer.Replace(template, env);
+
+        // Assert
+        result.Case.Should().Be(expected);
+    }
+
     [TestMethod]
     public void Replace_OnlyPlaceholder_ReturnsValue()
     {
