@@ -12,6 +12,11 @@
 		</AssemblyAttribute>
 	</ItemGroup>
 
+	<!-- Module projects -->
+	<ItemGroup Condition="'$(AssemblyName.Contains(`.Modules.`))' == 'true'">
+		<ProjectReference Include="..\CfgStore.Application.Abstractions\CfgStore.Application.Abstractions.csproj" />
+	</ItemGroup>
+
 	<!-- Test projects -->
 	<ItemGroup Condition="'$(AssemblyName.EndsWith(`.Tests`))' == 'true'">
 		<PackageReference Include="FluentAssertions" Version="6.12.0" />

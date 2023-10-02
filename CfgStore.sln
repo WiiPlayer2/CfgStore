@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Application.Abstra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Modules.Environment", "CfgStore.Modules.Environment\CfgStore.Modules.Environment.csproj", "{7248BB8F-44E7-4D27-806E-E6E30ED3231B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Modules.Environment.Tests", "CfgStore.Modules.Environment.Tests\CfgStore.Modules.Environment.Tests.csproj", "{1E7DB338-3154-4D60-86BD-1B3F42436BF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CfgStore.Modules.Environment.Tests", "CfgStore.Modules.Environment.Tests\CfgStore.Modules.Environment.Tests.csproj", "{1E7DB338-3154-4D60-86BD-1B3F42436BF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CfgStore.Modules.Shell", "CfgStore.Modules.Shell\CfgStore.Modules.Shell.csproj", "{BF01670D-ADB3-440D-AADF-C932357E99CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{1E7DB338-3154-4D60-86BD-1B3F42436BF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E7DB338-3154-4D60-86BD-1B3F42436BF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E7DB338-3154-4D60-86BD-1B3F42436BF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF01670D-ADB3-440D-AADF-C932357E99CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF01670D-ADB3-440D-AADF-C932357E99CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF01670D-ADB3-440D-AADF-C932357E99CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF01670D-ADB3-440D-AADF-C932357E99CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
