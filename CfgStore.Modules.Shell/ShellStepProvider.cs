@@ -6,17 +6,11 @@ namespace CfgStore.Modules.Shell;
 public class ShellStepProvider<RT> : IPipelineStepProvider<RT>
     where RT : struct, HasCancel<RT>
 {
-    public PipelineStep<RT> Load => (store, config, configs, next) =>
-        from cfg in ParseConfig(config.Value)
-        from _99 in FailEff<Unit>("TODO")
-        select unit;
+    public PipelineStep<RT> Load => Step(x => x.Load);
 
     public Seq<string> Names => Seq("shell", "cmd", "command", "commands");
 
-    public PipelineStep<RT> Store => (store, config, configs, next) =>
-        from cfg in ParseConfig(config.Value)
-        from _99 in FailEff<Unit>("TODO")
-        select unit;
+    public PipelineStep<RT> Store => Step(x => x.Store);
 
     private Eff<Config> ParseConfig(ConfigEntry configEntry) =>
         from passthrough in configEntry.Get("passthrough").Get()
@@ -50,6 +44,34 @@ public class ShellStepProvider<RT> : IPipelineStepProvider<RT>
             .Map(x => x.GetSeq().Select(x => x.Get()).Traverse(identity))
             .IfNone(() => Some(Seq<string>()))
             .ToEff($"Failed to parse {steps} for stage {stage}.");
+
+    private Aff<RT, Unit> RunStage(StagesConfig stagesConfig, Func<StagesConfig, StageConfig> getStageConfig, Func<StageConfig, Seq<string>> getSteps) =>
+        from steps in Eff(() =>
+            stagesConfig.All.Steps
+                .Concat(getSteps(stagesConfig.All))
+                .Concat(getStageConfig(stagesConfig).Steps)
+                .Concat(getSteps(getStageConfig(stagesConfig))))
+        from _ in RunSteps(steps)
+        select unit;
+
+    private Aff<RT, Unit> RunStep(string step) => throw new NotImplementedException();
+
+    private Aff<RT, Unit> RunSteps(Seq<string> steps) =>
+        steps
+            .Select(RunStep)
+            .TraverseSerial(identity)
+            .Map(_ => unit);
+
+    private PipelineStep<RT> Step(Func<StagesConfig, StageConfig> getStageConfig) =>
+        (store, config, configs, next) =>
+            from cfg in ParseConfig(config.Value)
+            from _0 in RunStage(cfg.Stages, getStageConfig, x => x.Before)
+            from _1 in cfg.Passthrough
+                ? from _0 in next(store, configs)
+                  from _1 in RunStage(cfg.Stages, getStageConfig, x => x.After)
+                  select unit
+                : unitAff
+            select unit;
 
     private record Config(
         bool Passthrough,
