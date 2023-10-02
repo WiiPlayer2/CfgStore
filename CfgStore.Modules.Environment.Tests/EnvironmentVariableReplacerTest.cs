@@ -18,7 +18,7 @@ public class EnvironmentVariableReplacerTest
         var result = EnvironmentVariableReplacer.Replace(template, env);
 
         // Assert
-        result.Should().Be(expected);
+        result.Case.Should().Be(expected);
     }
 
     [TestMethod]
@@ -33,6 +33,21 @@ public class EnvironmentVariableReplacerTest
         var result = EnvironmentVariableReplacer.Replace(template, env);
 
         // Assert
-        result.Should().Be(template);
+        result.Case.Should().Be(template);
+    }
+
+    [TestMethod]
+    public void Replace_WithPlaceholderWithoutMatchingValue_ReturnsFail()
+    {
+        // Arrange
+        var template = "${not_me}";
+        var env = Map(
+            ("test", "asdfg"));
+
+        // Act
+        var result = EnvironmentVariableReplacer.Replace(template, env);
+
+        // Assert
+        result.IsFail.Should().BeTrue();
     }
 }

@@ -48,7 +48,7 @@ public class EnvironmentStepProvider<RT> : IPipelineStepProvider<RT>
         select new ConfigMap(Map.createRange<OrdStringOrdinalIgnoreCase, string, ConfigEntry>(mappedEntries));
 
     private static Eff<ConfigValue> MapConfigValue(ConfigValue value, Map<string, string> values) =>
-        from mappedValue in Eff(() => EnvironmentVariableReplacer.Replace(value.Value, values))
+        from mappedValue in EffMaybe(() => EnvironmentVariableReplacer.Replace(value.Value, values))
         select new ConfigValue(mappedValue);
 
     private static Eff<Config> ParseConfig(PipelineStepConfig config) =>

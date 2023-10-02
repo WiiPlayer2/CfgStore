@@ -6,9 +6,9 @@ public static class EnvironmentVariableReplacer
 {
     private static readonly Regex variableRegex = new(@"^\${(?<variable>(\w|_)+)}$");
 
-    public static string Replace(string template, Map<string, string> values) =>
+    public static Fin<string> Replace(string template, Map<string, string> values) =>
         variableRegex.Match(template)
             .Apply(x => x.Success
-                ? values[x.Groups["variable"].Value]
+                ? values.Find(x.Groups["variable"].Value).ToFin()
                 : template);
 }
