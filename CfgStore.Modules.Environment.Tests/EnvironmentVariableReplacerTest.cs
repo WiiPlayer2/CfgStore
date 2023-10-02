@@ -22,6 +22,23 @@ public class EnvironmentVariableReplacerTest
     }
 
     [TestMethod]
+    public void Replace_WithMultiplePlaceholdersInTemplate_ReturnsTemplatedValue()
+    {
+        // Arrange
+        var template = "__${test}//${test2}..";
+        var env = Map(
+            ("test", "value"),
+            ("test2", "value2"));
+        var expected = "__value//value2..";
+
+        // Act
+        var result = EnvironmentVariableReplacer.Replace(template, env);
+
+        // Assert
+        result.Case.Should().Be(expected);
+    }
+
+    [TestMethod]
     public void Replace_WithoutPlaceholders_ReturnsTemplate()
     {
         // Arrange
@@ -34,6 +51,22 @@ public class EnvironmentVariableReplacerTest
 
         // Assert
         result.Case.Should().Be(template);
+    }
+
+    [TestMethod]
+    public void Replace_WithPlaceholderInTemplate_ReturnsTemplatedValue()
+    {
+        // Arrange
+        var template = "__${test}//";
+        var env = Map(
+            ("test", "value"));
+        var expected = "__value//";
+
+        // Act
+        var result = EnvironmentVariableReplacer.Replace(template, env);
+
+        // Assert
+        result.Case.Should().Be(expected);
     }
 
     [TestMethod]
