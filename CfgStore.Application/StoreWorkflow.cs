@@ -68,7 +68,8 @@ public class StoreWorkflow<RT>
             : SuccessAff(false)
         from _ in hasChanges
             ? from message in RenderCommitMessageTemplate(commitMessageTemplate)
-              from _ in gitApi.CommitAllChanges(message)
+              from _0 in gitApi.AddAll()
+              from _1 in gitApi.CommitAllChanges(message)
               select unit
             : unitAff
         select unit;

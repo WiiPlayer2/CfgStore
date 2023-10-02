@@ -7,6 +7,12 @@ namespace CfgStore.Cli.Implementations;
 internal class GitApi<RT> : IGitApi<RT>
     where RT : struct, HasCancel<RT>
 {
+    public Aff<RT, Unit> AddAll() =>
+        Aff(async (RT rt) => await CliWrap.Cli.Wrap("git")
+                .WithArguments("add -A")
+                .ExecuteBufferedAsync(rt.CancellationToken))
+            .Map(_ => unit);
+
     public Aff<RT, Unit> CommitAllChanges(string message) =>
         Aff(async (RT rt) => await CliWrap.Cli.Wrap("git")
                 .WithArguments(b => b

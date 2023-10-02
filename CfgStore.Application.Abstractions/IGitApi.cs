@@ -3,6 +3,8 @@
 public interface IGitApi<RT>
     where RT : struct, HasCancel<RT>
 {
+    Aff<RT, Unit> AddAll();
+
     Aff<RT, Unit> CommitAllChanges(string message);
 
     Aff<RT, bool> HasChanges();
