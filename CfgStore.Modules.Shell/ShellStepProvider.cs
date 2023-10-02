@@ -1,4 +1,6 @@
-﻿using CfgStore.Application.Abstractions;
+﻿using System.Text;
+using CfgStore.Application.Abstractions;
+using CliWrap;
 using LanguageExt.ClassInstances;
 
 namespace CfgStore.Modules.Shell;
@@ -54,7 +56,19 @@ public class ShellStepProvider<RT> : IPipelineStepProvider<RT>
         from _ in RunSteps(steps)
         select unit;
 
-    private Aff<RT, Unit> RunStep(string step) => throw new NotImplementedException();
+    private Aff<RT, Unit> RunStep(string step) =>
+        from _0 in Eff(fun(() => Console.WriteLine($"> {step}")))
+        from _1 in OperatingSystem.IsWindows()
+            ? Aff(async (RT rt) => await Cli.Wrap("pwsh")
+                    .WithArguments(b => b
+                        .Add("-EncodedCommand")
+                        .Add(Convert.ToBase64String(Encoding.Unicode.GetBytes(step))))
+                    .WithStandardOutputPipe(PipeTarget.ToStream(Console.OpenStandardOutput()))
+                    .WithStandardErrorPipe(PipeTarget.ToStream(Console.OpenStandardError()))
+                    .ExecuteAsync(rt.CancellationToken))
+                .Map(_ => unit)
+            : FailAff<Unit>("Unable to execute step due to the running platform.")
+        select unit;
 
     private Aff<RT, Unit> RunSteps(Seq<string> steps) =>
         steps
