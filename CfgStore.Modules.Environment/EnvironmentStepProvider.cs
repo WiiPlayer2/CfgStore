@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using CfgStore.Application.Abstractions;
+﻿using CfgStore.Application.Abstractions;
 using LanguageExt.ClassInstances;
 using Map = LanguageExt.Map;
 
@@ -8,8 +7,6 @@ namespace CfgStore.Modules.Environment;
 public class EnvironmentStepProvider<RT> : IPipelineStepProvider<RT>
     where RT : struct, HasCancel<RT>
 {
-    private static readonly Regex variableRegex = new(@"^\${(?<variable>(\w|_)+)}$");
-
     public PipelineStep<RT> Load { get; } = (store, config, configs, next) =>
         from _0 in unitEff
         from cfg in ParseConfig(config)
@@ -51,14 +48,8 @@ public class EnvironmentStepProvider<RT> : IPipelineStepProvider<RT>
         select new ConfigMap(Map.createRange<OrdStringOrdinalIgnoreCase, string, ConfigEntry>(mappedEntries));
 
     private static Eff<ConfigValue> MapConfigValue(ConfigValue value, Map<string, string> values) =>
-        from match in Eff(() => variableRegex.Match(value.Value))
-        from mappedValue in match.Success
-            ? from variable in Eff(() => match.Groups["variable"].Value)
-              from value in values.Find(variable).ToEff($"Variable ${{{variable}}} was not configured.")
-              let mappedValue = new ConfigValue(value)
-              select mappedValue
-            : SuccessEff(value)
-        select mappedValue;
+        from mappedValue in Eff(() => EnvironmentVariableReplacer.Replace(value.Value, values))
+        select new ConfigValue(mappedValue);
 
     private static Eff<Config> ParseConfig(PipelineStepConfig config) =>
         from variables in config.Value.Get("variables").GetSeq()
