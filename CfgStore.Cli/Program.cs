@@ -8,6 +8,7 @@ using CfgStore.Application.Abstractions;
 using CfgStore.Cli.Implementations;
 using CfgStore.Modules.Environment;
 using CfgStore.Modules.Files;
+using CfgStore.Modules.Shell;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,7 @@ await BuildCommandLine()
 
             services.AddSingleton<IPipelineStepProvider<RT>, FilesStepProvider<RT>>();
             services.AddSingleton<IPipelineStepProvider<RT>, EnvironmentStepProvider<RT>>();
+            services.AddSingleton<IPipelineStepProvider<RT>, ShellStepProvider<RT>>();
 
             services.AddSingleton<StoreWorkflow<RT>>();
             services.AddSingleton<LoadWorkflow<RT>>();
