@@ -19,7 +19,7 @@ public class FilesStepProvider<RT> : IPipelineStepProvider<RT> where RT : struct
             .TraverseParallel(identity)
         select unit;
 
-    public string Name => "files";
+    public Seq<string> Names => Seq("file", "files", "directory", "directories");
 
     public PipelineStep<RT> Store { get; } = (store, config, _, _) =>
         from cfg in ParseConfig(config)

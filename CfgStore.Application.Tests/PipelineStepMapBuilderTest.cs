@@ -22,8 +22,8 @@ public class PipelineStepMapBuilderTest
     public void BuildWithSteps_ReturnsMap()
     {
         // Arrange
-        var step1 = Mock.Of<IPipelineStepProvider<RT>>(x => x.Name == "step1");
-        var step2 = Mock.Of<IPipelineStepProvider<RT>>(x => x.Name == "step2");
+        var step1 = Mock.Of<IPipelineStepProvider<RT>>(x => x.Names == Seq1("step1"));
+        var step2 = Mock.Of<IPipelineStepProvider<RT>>(x => x.Names == Seq1("step2"));
         var stepProviders = Seq(step1, step2);
 
         // Act

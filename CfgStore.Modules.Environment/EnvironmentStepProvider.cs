@@ -17,7 +17,7 @@ public class EnvironmentStepProvider<RT> : IPipelineStepProvider<RT>
         from _99 in next(store, mappedConfigs)
         select unit;
 
-    public string Name => "env";
+    public Seq<string> Names => Seq("env", "environ", "environment");
 
     public PipelineStep<RT> Store => Load;
 

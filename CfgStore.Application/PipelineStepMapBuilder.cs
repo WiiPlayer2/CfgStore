@@ -9,5 +9,5 @@ public class PipelineStepMapBuilder<RT>
 {
     public static Map<OrdStringOrdinalIgnoreCase, string, PipelineStepInfo<RT>> Build(Seq<IPipelineStepProvider<RT>> pipelineStepProviders) =>
         Map.createRange<OrdStringOrdinalIgnoreCase, string, PipelineStepInfo<RT>>(
-            pipelineStepProviders.Select(x => (x.Name, new PipelineStepInfo<RT>(x.Store, x.Load))));
+            pipelineStepProviders.SelectMany(x => x.Names, (y, x) => (x, new PipelineStepInfo<RT>(y.Store, y.Load))));
 }

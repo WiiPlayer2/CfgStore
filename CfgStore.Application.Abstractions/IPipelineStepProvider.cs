@@ -5,7 +5,7 @@ public interface IPipelineStepProvider<RT>
 {
     PipelineStep<RT> Load { get; }
 
-    string Name { get; }
+    Seq<string> Names { get; }
 
     PipelineStep<RT> Store { get; }
 }
