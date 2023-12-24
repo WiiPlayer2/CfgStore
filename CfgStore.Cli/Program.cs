@@ -6,6 +6,7 @@ using System.CommandLine.Parsing;
 using CfgStore.Application;
 using CfgStore.Application.Abstractions;
 using CfgStore.Cli.Implementations;
+using CfgStore.Modules.Conditional;
 using CfgStore.Modules.Environment;
 using CfgStore.Modules.Files;
 using CfgStore.Modules.Shell;
@@ -34,6 +35,7 @@ await BuildCommandLine()
             services.AddSingleton<IPipelineStepProvider<RT>, FilesStepProvider<RT>>();
             services.AddSingleton<IPipelineStepProvider<RT>, EnvironmentStepProvider<RT>>();
             services.AddSingleton<IPipelineStepProvider<RT>, ShellStepProvider<RT>>();
+            services.AddSingleton<IPipelineStepProvider<RT>, ConditionalStepProvider<RT>>();
 
             services.AddSingleton<StoreWorkflow<RT>>();
             services.AddSingleton<LoadWorkflow<RT>>();
