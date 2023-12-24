@@ -23,6 +23,7 @@
 		<ProjectReference Include="..\CfgStore.Modules.Environment\CfgStore.Modules.Environment.csproj" />
 		<ProjectReference Include="..\CfgStore.Modules.Files\CfgStore.Modules.Files.csproj" />
 		<ProjectReference Include="..\CfgStore.Modules.Shell\CfgStore.Modules.Shell.csproj" />
+		<ProjectReference Include="..\CfgStore.Modules.Conditional\CfgStore.Modules.Conditional.csproj" />
 	</ItemGroup>
 
 </Project>
