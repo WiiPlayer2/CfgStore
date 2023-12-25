@@ -34,7 +34,9 @@ public class FilesStepProvider<RT> : IPipelineStepProvider<RT> where RT : struct
             .ToSeq()
         from _ in files.Select(x =>
                 from content in Aff((RT rt) => File.ReadAllTextAsync(x.FullName, rt.CancellationToken).ToValue())
-                from relativePath in Eff(() => new Uri(cfg.Directory.FullName + Path.DirectorySeparatorChar, UriKind.Absolute).MakeRelativeUri(new Uri(x.FullName, UriKind.Absolute)).ToString())
+                from relativePath in Eff(() => Uri.UnescapeDataString(new Uri(cfg.Directory.FullName + Path.DirectorySeparatorChar, UriKind.Absolute)
+                    .MakeRelativeUri(new Uri(x.FullName, UriKind.Absolute))
+                    .ToString()))
                 from _ in store.WriteText(relativePath, content)
                 select unit
             )
