@@ -31,7 +31,7 @@ internal class GitApi<RT> : IGitApi<RT>
 
     public Aff<RT, Unit> Pull() =>
         Aff(async (RT rt) => await CliWrap.Cli.Wrap("git")
-                .WithArguments("pull")
+                .WithArguments("pull --rebase")
                 .ExecuteBufferedAsync(rt.CancellationToken))
             .Map(_ => unit);
 
