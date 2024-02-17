@@ -12,7 +12,7 @@ public class ConditionalStepProvider<RT> : IPipelineStepProvider<RT>
             let os = Environment.OSVersion
             from cmd in GetCommand(cfg, os)
             from shell in GetPlatformSpecificShell(os)
-            from result in ExecCommand(shell, cmd)
+            from result in ExecCommand(shell.Shell, shell.Arugments, cmd)
             from _ in RunConditionalNext(result != cfg.Invert, next, store, configs)
             select unit;
 
@@ -22,9 +22,9 @@ public class ConditionalStepProvider<RT> : IPipelineStepProvider<RT>
 
     public PipelineStep<RT> Store => Step;
 
-    private static Aff<RT, bool> ExecCommand(string shell, string command) =>
+    private static Aff<RT, bool> ExecCommand(string shell, string shellArguments, string command) =>
         Aff(async (RT rt) => await Cli.Wrap(shell)
-                .WithArguments("-c -")
+                .WithArguments(shellArguments)
                 .WithStandardInputPipe(PipeSource.FromString(command))
                 .WithStandardOutputPipe(PipeTarget.ToStream(Console.OpenStandardOutput()))
                 .WithStandardErrorPipe(PipeTarget.ToStream(Console.OpenStandardError()))
@@ -44,12 +44,12 @@ public class ConditionalStepProvider<RT> : IPipelineStepProvider<RT>
             _ => Option<string>.None,
         };
 
-    private static Eff<string> GetPlatformSpecificShell(OperatingSystem os) =>
+    private static Eff<(string Shell, string Arugments)> GetPlatformSpecificShell(OperatingSystem os) =>
         os.Platform switch
         {
-            PlatformID.Win32NT => SuccessEff("pwsh"),
-            PlatformID.Unix => SuccessEff("bash"),
-            _ => FailEff<string>($"{os.VersionString} is currently not supported."),
+            PlatformID.Win32NT => SuccessEff(("pwsh", "-c -")),
+            PlatformID.Unix => SuccessEff(("bash", string.Empty)),
+            _ => FailEff<(string, string)>($"{os.VersionString} is currently not supported."),
         };
 
     private static Eff<Config> ParseConfig(ConfigEntry configEntry) =>
